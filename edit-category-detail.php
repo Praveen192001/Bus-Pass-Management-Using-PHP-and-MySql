@@ -5,7 +5,38 @@ include('includes/dbconnection.php');
 if (strlen($_SESSION['bpmsaid']==0)) {
   header('location:logout.php');
   } else{
-    
+    if(isset($_POST['submit']))
+  {
+
+
+ $catname=$_POST['catname'];
+
+$eid=$_GET['editid'];
+$ret="select CategoryName from tblcategory where CategoryName=:catname";
+ $query= $dbh -> prepare($ret);
+$query->bindParam(':catname',$catname,PDO::PARAM_STR);
+
+$query-> execute();
+     $results = $query -> fetchAll(PDO::FETCH_OBJ);
+     if($query -> rowCount() == 0)
+{
+$sql="update tblcategory set CategoryName=:catname where ID=:eid";
+$query=$dbh->prepare($sql);
+$query->bindParam(':catname',$catname,PDO::PARAM_STR);
+
+$query->bindParam(':eid',$eid,PDO::PARAM_STR);
+
+ $query->execute();
+
+   echo '<script>alert("Category name has been updated")</script>';
+  
+}
+else
+{
+
+echo "<script>alert('Category Name Already Exist. Please try again');</script>";
+}
+}
 ?>
 
 <!DOCTYPE html>
@@ -21,15 +52,7 @@ if (strlen($_SESSION['bpmsaid']==0)) {
    <link href="assets/css/style.css" rel="stylesheet" />
       <link href="assets/css/main-style.css" rel="stylesheet" />
 
-<script type="text/javascript">     
-    function PrintDiv() {    
-       var divToPrint = document.getElementById('divToPrint');
-       var popupWin = window.open('', '_blank', 'width=500,height=500');
-       popupWin.document.open();
-       popupWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</html>');
-        popupWin.document.close();
-            }
- </script>
+
 
 </head>
 
@@ -48,7 +71,7 @@ if (strlen($_SESSION['bpmsaid']==0)) {
             <div class="row">
                  <!-- page header -->
                 <div class="col-lg-12">
-                    <h1 class="page-header">Pass Details</h1>
+                    <h1 class="page-header">Update Category</h1>
                 </div>
                 <!--end page header -->
             </div>
@@ -58,11 +81,12 @@ if (strlen($_SESSION['bpmsaid']==0)) {
                     <div class="panel panel-default">
                        
                         <div class="panel-body">
-                            <div class="row" id="divToPrint">
+                            <div class="row">
                                 <div class="col-lg-12">
-                                   <?php
-$vid=$_GET['viewid'];
-$sql="SELECT * from  tblpass where ID=$vid";
+                                    <form method="post" enctype="multipart/form-data"> 
+                                      <?php
+$eid=$_GET['editid'];
+$sql="SELECT * from  tblcategory where ID=$eid";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -71,63 +95,11 @@ if($query->rowCount() > 0)
 {
 foreach($results as $row)
 {               ?>
-                                    <table border="1" class="table table-bordered" > 
-                                    <tr align="center">
-<td colspan="6" style="font-size:20px;color:blue">
- Pass ID: <?php  echo ($row->PassNumber);?></td></tr>
-   <tr>
-        <th scope>Category</th>
-    <td colspan="3"><?php  echo ($row->Category);?></td>
-  </tr>
-<tr>
-    <th scope>Full Name</th>
-    <td colspan="3"><?php  echo ($row->FullName);?></td>
-    
-  </tr>
-  <tr>
-    <th scope>Photo</th>
-    <td colspan="3"><img src="images/<?php  echo ($row->ProfileImage);?>" width="50" height="50"></td>
-
-  </tr>
-
-  <tr>
-    <th scope>Mobile Number</th>
-    <td><?php  echo ($row->ContactNumber);?></td>
-    <th scope>Email</th>
-    <td><?php  echo ($row->Email);?></td>
-  </tr>
-<tr>
-    <th scope>Identity Type</th>
-    <td><?php  echo ($row->IdentityType);?></td>
-    <th scope>Identity Card Number</th>
-    <td><?php  echo ($row->IdentityCardno);?></td>
-
-  </tr>
-  <tr>
-    <th scope>Source</th>
-    <td><?php  echo ($row->Source);?></td>
-    <th scope>Destination</th>
-    <td><?php  echo ($row->Destination);?></td>
-  </tr>
-<tr>
-    <th scope>From Date</th>
-    <td><?php  echo ($row->FromDate);?></td>
-    <th scope>To Date</th>
-    <td><?php  echo ($row->ToDate);?></td>
-  </tr>
-  <tr>
-    
-    <th scope>Cost</th>
-    <td><?php  echo ($row->Cost);?></td>
-    <th scope>Pass Creation Date</th>
-    <td><?php  echo ($row->PasscreationDate);?></td>
-  </tr>
                                     
-   <?php $cnt=$cnt+1;}} ?>
-   </table>
-   <p style="text-align: center;font-size: 20px;color: red">
-  <input type="button" value="print" onclick="PrintDiv();" /></p>
-    
+    <div class="form-group"> <label for="exampleInputEmail1">Category Name</label> <input type="text" name="catname" value="<?php  echo $row->CategoryName;?>" class="form-control" required='true'> </div>
+   
+     <?php $cnt=$cnt+1;}} ?> 
+     <p style="padding-left: 450px"><button type="submit" class="btn btn-primary" name="submit" id="submit">Update</button></p> </form>
                                 </div>
                                 
                             </div>

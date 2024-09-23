@@ -3,61 +3,114 @@ session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
 
-  ?>
+if(isset($_POST['login'])) 
+  {
+    $username=$_POST['username'];
+    $password=md5($_POST['password']);
+    $sql ="SELECT ID FROM tbladmin WHERE UserName=:username and Password=:password";
+    $query=$dbh->prepare($sql);
+    $query-> bindParam(':username', $username, PDO::PARAM_STR);
+$query-> bindParam(':password', $password, PDO::PARAM_STR);
+    $query-> execute();
+    $results=$query->fetchAll(PDO::FETCH_OBJ);
+    if($query->rowCount() > 0)
+{
+foreach ($results as $result) {
+$_SESSION['bpmsaid']=$result->ID;
+}
+
+  if(!empty($_POST["remember"])) {
+//COOKIES for username
+setcookie ("user_login",$_POST["username"],time()+ (10 * 365 * 24 * 60 * 60));
+//COOKIES for password
+setcookie ("userpassword",$_POST["password"],time()+ (10 * 365 * 24 * 60 * 60));
+} else {
+if(isset($_COOKIE["user_login"])) {
+setcookie ("user_login","");
+if(isset($_COOKIE["userpassword"])) {
+setcookie ("userpassword","");
+        }
+      }
+}
+$_SESSION['login']=$_POST['username'];
+echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
+} else{
+echo "<script>alert('Invalid Details');</script>";
+}
+}
+
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-<title>Bus Pass Management System || Home Page</title>
+ 
+    <title>Bus Pass Management System | Login Page</title>
+    <!-- Core CSS - Include with every page -->
+    <link href="assets/plugins/bootstrap/bootstrap.css" rel="stylesheet" />
+    <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link href="assets/plugins/pace/pace-theme-big-counter.css" rel="stylesheet" />
+   <link href="assets/css/style.css" rel="stylesheet" />
+      <link href="assets/css/main-style.css" rel="stylesheet" />
 
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<!-- Custom Theme files -->
-<link href="css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
-<link href="css/style.css" type="text/css" rel="stylesheet" media="all"> 
-<link rel="stylesheet" href="css/flexslider.css" type="text/css" media="screen" />  <!-- flexslider-CSS --> 
-<link href="css/font-awesome.css" rel="stylesheet">		<!-- font-awesome icons -->  
-<!-- //Custom Theme files -->  
-<!-- web-fonts -->   
-<link href="//fonts.googleapis.com/css?family=Oswald:200,300,400,500,600,700" rel="stylesheet">
-<link href="//fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
-<!-- //web-fonts -->
 </head>
-<body>  
-	<!-- banner -->
-	<div class="agileits-banner">
-		<div class="bnr-agileinfo"> 
-			<!-- navigation -->
-			<?php include_once('includes/header.php');?>	
-			<!-- //navigation -->
-			<!-- banner-text -->
-			<div class="banner-text agileinfo"> 
-			
-			</div>
-			
-		
-		</div>
-	</div>
-	
-	
-	
-		
-	<!-- footer -->
-	<?php include_once('includes/footer.php');?>   
-	<!-- js --> 
-	<script src="js/jquery-2.2.3.min.js"></script> 
-	<script src="js/SmoothScroll.min.js"></script> 
-	<script src="js/jarallax.js"></script> 
-	<script type="text/javascript">
-		/* init Jarallax */
-		$('.jarallax').jarallax({
-			speed: 0.5,
-			imgWidth: 1366,
-			imgHeight: 768
-		})
-	</script>  
-	<!-- //js -->
 
-	 
-	
-    <script src="js/bootstrap.js"></script>
+<body class="body-Login-back">
+
+    <div class="container">
+       
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 text-center logo-margin ">
+              <h3 style="color: white;">Bus Pass Management System</h3>
+                </div>
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-default">                  
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Please Sign In</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form role="form" method="post" name="login">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label for="login-username">Username</label>
+                                     <input type="text" class="form-control"  required="true" name="username" value="<?php if(isset($_COOKIE["user_login"])) { echo $_COOKIE["user_login"]; } ?>">
+                                                
+                                </div>
+                                <div class="form-group">
+                                    <label for="login-password">Password</label>
+                                    <input type="password" class="form-control" name="password" required="true" value="<?php if(isset($_COOKIE["userpassword"])) { echo $_COOKIE["userpassword"]; } ?>">
+                                                
+                                </div>
+                                <div class="checkbox">
+                                  
+                                        <input type="checkbox" id="remember" name="remember" <?php if(isset($_COOKIE["user_login"])) { ?> checked <?php } ?> />
+                <label for="keep_me_logged_in">Keep me signed in</label>
+                                   
+
+<label style="padding-left: 40px">
+    <a href="forgot-password.php">Lost Password?</a></label>
+                                </div>
+
+                                <!-- Change this to a button or input when using this as a form -->
+                               
+                                <input type="submit" value="Login" class="btn btn-lg btn-success btn-block" name="login" >
+                            </fieldset>
+                        </form>
+                        <div>
+                    <i class="fa fa-home" style="font-size: 30px" aria-hidden="true"></i>
+                    <p><a href="../index.php"> Back Home </a></p>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Core Scripts - Include with every page -->
+    <script src="assets/plugins/jquery-1.10.2.js"></script>
+    <script src="assets/plugins/bootstrap/bootstrap.min.js"></script>
+    <script src="assets/plugins/metisMenu/jquery.metisMenu.js"></script>
+
 </body>
+
 </html>
